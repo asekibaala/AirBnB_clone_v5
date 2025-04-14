@@ -37,6 +37,8 @@ class DBStorage:
         objects = {}
         if cls:
             # Query only the specified class
+            if isinstance(cls, str):
+                cls = eval(cls)  # Convert string to class if passed as a string
             query = self.__session.query(cls).all()
             for obj in query:
                 key = f"{obj.__class__.__name__}.{obj.id}"
