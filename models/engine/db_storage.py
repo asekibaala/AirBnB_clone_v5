@@ -36,13 +36,15 @@ class DBStorage:
         """Queries all objects of a given class or all objects."""
         objects = {}
         if cls:
+            # Query only the specified class
             query = self.__session.query(cls).all()
             for obj in query:
                 key = f"{obj.__class__.__name__}.{obj.id}"
                 objects[key] = obj
         else:
-            for cls_name in [User, State, City, Amenity, Place, Review]:
-                query = self.__session.query(cls_name).all()
+            # Query all classes
+            for cls in [User, State, City, Amenity, Place, Review]:
+                query = self.__session.query(cls).all()
                 for obj in query:
                     key = f"{obj.__class__.__name__}.{obj.id}"
                     objects[key] = obj
