@@ -4,7 +4,6 @@ from sqlalchemy import Column, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 import uuid
-from models import storage
 
 Base = declarative_base()
 
@@ -35,16 +34,17 @@ class BaseModel:
             self.created_at = datetime.utcnow()
             self.updated_at = datetime.utcnow()
 
-    def __str__(self):
-        """Returns a string representation of the instance."""
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
-
     def save(self):
-        """Updates updated_at and saves the instance to storage."""
+        """Saves the instance to storage."""
+        from models import storage  # Import here to avoid circular import
         self.updated_at = datetime.utcnow()
         storage.new(self)
         storage.save()
+
+    def delete(self):
+        """Deletes the instance from storage."""
+        from models import storage  # Import here to avoid circular import
+        storage.delete(self)
 
     def to_dict(self):
         """Converts instance into a dictionary format."""
@@ -55,7 +55,3 @@ class BaseModel:
         if "_sa_instance_state" in dictionary:
             del dictionary["_sa_instance_state"]
         return dictionary
-
-    def delete(self):
-        """Deletes the current instance from storage."""
-        storage.delete(self)
