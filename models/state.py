@@ -1,22 +1,21 @@
 #!/usr/bin/python3
-""" State Module for HBNB project """
-from models.base_model import BaseModel, Base
+"""This module defines a class for State"""
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-from models import storage
-from models.city import City
+from models.base_model import BaseModel, Base
 
 
 class State(BaseModel, Base):
-    """Represents a state for a MySQL database."""
+    """State class for storing state information"""
     __tablename__ = 'states'
     name = Column(String(128), nullable=False)
     cities = relationship("City", backref="state", cascade="all, delete, delete-orphan")
 
     @property
     def cities(self):
-        """Returns the list of City instances with state_id equal to the current State.id."""
-        from models import storage
+        """Getter for cities related to the state (for FileStorage)"""
+        from models import storage  # Import here to avoid circular import
+        from models.city import City
         city_list = []
         for city in storage.all(City).values():
             if city.state_id == self.id:
