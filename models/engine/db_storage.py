@@ -39,6 +39,8 @@ class DBStorage:
             # Query only the specified class
             if isinstance(cls, str):
                 cls = eval(cls)  # Convert string to class if passed as a string
+            if cls not in [User, State, City, Amenity, Place, Review]:
+                raise ValueError(f"{cls} is not a valid SQLAlchemy model.")
             query = self.__session.query(cls).all()
             for obj in query:
                 key = f"{obj.__class__.__name__}.{obj.id}"
@@ -67,6 +69,7 @@ class DBStorage:
 
     def reload(self):
         """Reloads the database session."""
+        # Create all tables in the database
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         self.__session = scoped_session(session_factory)
