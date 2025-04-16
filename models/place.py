@@ -3,7 +3,6 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from models import storage
 
 
 # Table for Many-To-Many relationship between Place and Amenity
@@ -30,22 +29,14 @@ class Place(BaseModel, Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
 
-    # Relationship with Review for DBStorage
-    reviews = relationship("Review", backref="place", cascade="all, delete, delete-orphan")
-
     # Relationship with Amenity for DBStorage
     amenities = relationship("Amenity", secondary="place_amenity", viewonly=False)
 
     # Getter for FileStorage
     @property
-    def reviews(self):
-        """Returns the list of Review instances with place_id equal to the current Place.id"""
-        from models.review import Review
-        return [review for review in storage.all(Review).values() if review.place_id == self.id]
-
-    @property
     def amenities(self):
         """Getter for amenities in FileStorage"""
+        from models import storage  # Import moved here to avoid circular import
         from models.amenity import Amenity
         return [amenity for amenity in storage.all(Amenity).values() if amenity.id in self.amenity_ids]
 
