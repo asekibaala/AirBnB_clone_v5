@@ -3,6 +3,7 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
+from models import storage
 
 
 # Table for Many-To-Many relationship between Place and Amenity
@@ -32,11 +33,13 @@ class Place(BaseModel, Base):
     # Relationship with Amenity for DBStorage
     amenities = relationship("Amenity", secondary="place_amenity", viewonly=False)
 
+    # Attribute for FileStorage
+    amenity_ids = []  # List of Amenity IDs for FileStorage
+
     # Getter for FileStorage
     @property
     def amenities(self):
         """Getter for amenities in FileStorage"""
-        from models import storage  # Import moved here to avoid circular import
         from models.amenity import Amenity
         return [amenity for amenity in storage.all(Amenity).values() if amenity.id in self.amenity_ids]
 
@@ -45,7 +48,4 @@ class Place(BaseModel, Base):
         """Setter for amenities in FileStorage"""
         from models.amenity import Amenity
         if isinstance(obj, Amenity):
-            if hasattr(self, 'amenity_ids'):
-                self.amenity_ids.append(obj.id)
-            else:
-                self.amenity_ids = [obj.id]
+            self.amenity_ids.append(obj.id)
