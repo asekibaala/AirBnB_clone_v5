@@ -3,6 +3,8 @@
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
+from models import storage
+from models.city import City
 
 
 class State(BaseModel, Base):
@@ -13,11 +15,7 @@ class State(BaseModel, Base):
 
     @property
     def cities(self):
-        """Getter for cities related to the state (for FileStorage)"""
-        from models import storage  # Import here to avoid circular import
-        from models.city import City
-        city_list = []
-        for city in storage.all(City).values():
-            if city.state_id == self.id:
-                city_list.append(city)
-        return city_list
+        """Return the list of City objects linked to the current State."""
+        if storage._DBStorage__engine is None:  # Check if not DBStorage
+            return [city for city in storage.all(City).values() if city.state_id == self.id]
+        return []
