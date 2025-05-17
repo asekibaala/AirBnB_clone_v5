@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Starts a Flask web application to display a list of states
+Starts a Flask web application to display a list of states.
 """
 from flask import Flask, render_template
 from models import storage

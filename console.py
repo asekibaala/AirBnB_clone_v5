@@ -261,6 +261,12 @@ class HBNBCommand(cmd.Cmd):
         print("Updates an object with new information")
         print("[Usage]: update <className> <id> <attName> <attVal>\n")
 
+    def reload(self):
+        """Reloads the database session."""
+        Base.metadata.create_all(self.__engine)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = scoped_session(session_factory)
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
